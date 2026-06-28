@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-15 -25 45 45" width="500" height="500">
+  <defs>
+    <style>
+      /* 复用 clawd-happy 的弹跳/影子/眨眼，加上爱心心跳 + 小爱心上飘 */
+      .bounce-anim { transform-box: fill-box; transform-origin: 50% 100%; animation: bounce 1.1s infinite ease-in-out; }
+      .shadow-anim { transform-box: fill-box; transform-origin: 50% 50%; animation: shadow 1.1s infinite ease-in-out; }
+      .heart-beat  { transform-box: fill-box; transform-origin: 50% 50%; animation: beat 0.8s infinite ease-in-out; }
+      .eyes-blink  { transform-box: fill-box; transform-origin: 50% 50%; animation: blink 2.6s infinite linear; }
+      .floater     { opacity: 0; animation: floatUp 1.8s infinite ease-out; animation-delay: var(--delay, 0s); }
+
+      @keyframes bounce {
+        0%, 15%, 100% { transform: translateY(0) scaleY(1); }
+        20% { transform: translateY(0) scaleY(0.88); }
+        45%, 55% { transform: translateY(-7px) scaleY(1.04); }
+        80% { transform: translateY(0) scaleY(0.88); }
+        85% { transform: translateY(0) scaleY(1); }
+      }
+      @keyframes shadow {
+        0%, 15%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(0.6); opacity: 0.2; }
+        80% { transform: scale(1.05); opacity: 0.55; }
+      }
+      @keyframes beat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.25); }
+        50% { transform: scale(0.95); }
+      }
+      @keyframes blink {
+        0%, 93%, 100% { transform: scaleY(1); }
+        96% { transform: scaleY(0.1); }
+      }
+      @keyframes floatUp {
+        0%   { opacity: 0; transform: translateY(0); }
+        20%  { opacity: 1; transform: translateY(-2px); }
+        80%  { opacity: 0.9; transform: translateY(-13px); }
+        100% { opacity: 0; transform: translateY(-17px); }
+      }
+    </style>
+
+    <!-- 小爱心粒子（3x3 像素心） -->
+    <g id="mini-heart">
+      <rect x="0" y="0" width="1" height="1"/>
+      <rect x="2" y="0" width="1" height="1"/>
+      <rect x="0" y="1" width="3" height="1"/>
+      <rect x="1" y="2" width="1" height="1"/>
+    </g>
+  </defs>
+
+  <!-- 地面影子 -->
+  <rect class="shadow-anim" x="3" y="15" width="9" height="1" fill="#000000"/>
+
+  <!-- 上飘的小爱心 -->
+  <g fill="#E8556D">
+    <g transform="translate(-4,4)"><use href="#mini-heart" class="floater" style="--delay:0s"/></g>
+    <g transform="translate(14,1)"><use href="#mini-heart" class="floater" style="--delay:0.4s" fill="#F49AAC"/></g>
+    <g transform="translate(17,10)"><use href="#mini-heart" class="floater" style="--delay:0.9s"/></g>
+    <g transform="translate(-6,11)"><use href="#mini-heart" class="floater" style="--delay:1.3s" fill="#F49AAC"/></g>
+    <g transform="translate(7,-7)"><use href="#mini-heart" class="floater" style="--delay:0.6s"/></g>
+  </g>
+
+  <!-- 主角螃蟹 -->
+  <g class="bounce-anim">
+    <!-- 头顶举着的爱心（在抬起的钳子之间，心跳） -->
+    <g transform="translate(5,-2)">
+      <g class="heart-beat" fill="#E8556D">
+        <rect x="0" y="0" width="2" height="1"/>
+        <rect x="3" y="0" width="2" height="1"/>
+        <rect x="0" y="1" width="5" height="2"/>
+        <rect x="1" y="3" width="3" height="1"/>
+        <rect x="2" y="4" width="1" height="1"/>
+      </g>
+    </g>
+
+    <!-- 身体 -->
+    <g fill="#DE886D">
+      <rect x="3" y="13" width="1" height="2"/>
+      <rect x="5" y="13" width="1" height="2"/>
+      <rect x="9" y="13" width="1" height="2"/>
+      <rect x="11" y="13" width="1" height="2"/>
+      <rect x="2" y="6" width="11" height="7"/>
+      <!-- 抬起的钳子，伸向头顶的爱心 -->
+      <rect x="3" y="4" width="1" height="2"/>
+      <rect x="4" y="3" width="1" height="1"/>
+      <rect x="11" y="4" width="1" height="2"/>
+      <rect x="10" y="3" width="1" height="1"/>
+    </g>
+
+    <!-- 害羞脸颊 -->
+    <g fill="#F49AAC">
+      <rect x="3" y="10" width="1" height="1"/>
+      <rect x="11" y="10" width="1" height="1"/>
+    </g>
+
+    <!-- 眼睛 -->
+    <g class="eyes-blink" fill="#000000">
+      <rect x="4" y="8" width="1" height="2"/>
+      <rect x="10" y="8" width="1" height="2"/>
+    </g>
+  </g>
+</svg>

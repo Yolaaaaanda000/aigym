@@ -32,12 +32,31 @@ clawd-on-desk/    ← 官方桌宠引擎（AGPL，gitignore，只在 Yolanda 本
 
 ## 怎么跑
 
-这个仓库本身**不是一个能独立运行的 app**，它是叠加在 clawd-on-desk 上的扩展。
+这个仓库本身**不是一个能独立运行的 app**，它是叠加在 clawd-on-desk 上的扩展。下面三种用法按「你是谁」分。
 
+### 想直接用（一键装，推荐）
+
+本机有 `git` / `node` / `npm` 就行：
+```bash
+git clone https://github.com/Yolaaaaanda000/aigym.git
+cd aigym
+./install.sh      # clone clawd-on-desk → 注入 BreakCard → 软链 → 放比心素材 → npm install（幂等，可重复跑）
+./start.sh        # 启动健身桌宠
+```
+`install.sh` 把 AGPL 引擎 clone 到**你自己机器**上（`clawd-on-desk/`，已 gitignore，不随本仓库分发 → IP 干净）。想装到别处：`./install.sh /你要的/路径`，启动同理 `./start.sh /你要的/路径`。
+
+> 启动后：等你的 coding agent 跑长任务、你手停下来干等时，桌宠会自己递一张抽卡微健身浮窗 → 抽卡 → 按组训练 → 做完螃蟹比心。
+> 想快点看到弹卡：`design/triggers.json` 把 `minBusySec` 临时改 `8`，再 `./start.sh`。
+
+### 手动版（懂终端、想自己控制每一步）
+
+`install.sh` 自动做的就是这四步，想手动也行：
 1. clone 官方桌宠：`git clone https://github.com/rullerzhou-afk/clawd-on-desk.git`
-2. 把本仓库的 `breakcard/`、`design/` **软链接**进 `clawd-on-desk/`（不复制，免漂移；命令见 `breakcard/INJECTION.md`）
-3. 按 `breakcard/INJECTION.md` 做三处注入
-4. `cd clawd-on-desk && npm install && npm start`（国内镜像 / 跳过 sidecar 见 INJECTION.md）
+2. 把本仓库的 `breakcard/`、`design/` **软链接**进 `clawd-on-desk/`（不复制，免漂移）
+3. 按 `breakcard/INJECTION.md` 做三处注入（main.js / state.js / theme.json + 比心素材）
+4. `cd clawd-on-desk && npm install && CLAWD_SKIP_SIDECAR_FETCH=1 npm start`
+
+> 注入逻辑已脚本化在 `install/inject.cjs`（读 `install/fragments/` 里的代码片段，锚点插入、幂等）；`INJECTION.md` 讲的是它背后的 why。
 
 ### Claire 的开发方式（不用碰桌宠 / clawd-on-desk）
 
@@ -60,14 +79,15 @@ clawd-on-desk 的源码是 **AGPL** 协议（传染性很强）。所以我们**
 - **① 叠加包 + 安装说明（IP 干净，门槛高）**：别人自己 `git clone` clawd-on-desk，再套用本仓库的 `breakcard/`、`design/` + 按 [`breakcard/INJECTION.md`](breakcard/INJECTION.md) 注入（含比心素材）。你**没有分发 clawd 的代码** → IP 不被传染。代价：用户得会用终端、手动注入。← 现状就是这条（见上面「怎么跑」）。
 - **② 打包成一个 app 直接发（门槛低，IP 被传染）**：把 clawd-on-desk + BreakCard 打成 `.dmg`/`.exe` 直接发。双击即用，但**你一旦分发「打包了 clawd 的成品」，AGPL 就要求你把整个分发的源码也按 AGPL 公开** —— 跟闭源/商用冲突。
 
-**推荐（既能给别人用、又不踩 AGPL）**：写一个**自动安装脚本** `install.sh`，在用户机器上自动 clone clawd-on-desk、软链、打补丁注入、放素材、`npm install`。用户跑一条命令就好，但 clawd 是**在他自己机器上装的、不是你分发的** → IP 仍干净。这是门槛与合规的最佳平衡，待做（现状是手动版「怎么跑」）。
+**推荐（既能给别人用、又不踩 AGPL）= 现在的 `install.sh`**：用户跑一条命令，脚本在**他自己机器上**自动 clone clawd-on-desk、软链 `breakcard/`+`design/`、打补丁注入（`install/inject.cjs`）、放比心素材、`npm install`。clawd 是**他装的、不是你分发的** → IP 仍干净。这是门槛与合规的最佳平衡 —— 用法见上面「怎么跑 · 一键装」。（✅ 已落地，不再是手动版。）
 
 ---
 
-## 现在的边界（v0 故意不做的）
+## 现在做到哪了
 
-- ❌ 不记录任何健身数据（隐私 + 还没到那一步，见 design/README.md）
-- ❌ 不接屏幕使用时间统计（先验证「人会不会动」）
-- ✅ 只做：working→idle 时弹卡 → 抽卡 → 5 分钟计时 → 螃蟹比心
+- ✅ working→idle 时弹卡 → 选场景 → 翻翻乐抽卡 → **按组训练**（reps 点按 / hold·timed 读秒 / 组间休息）→ 做完所有组才螃蟹比心
+- ✅ 本地记录（完成 / 拒绝 / 小睡，localStorage，不上云）+ 设置页（免打扰 / 弹卡频率 / 静默时段）
+- ❌ 设置还没接通引擎：改了只存本地，暂不改弹卡时机 —— 下一步见 `breakcard/INJECTION.md`「B 待办」
+- ❌ 不接屏幕使用时间统计；记录不上云、不做账号
 
 验证了核心假设再往上加。
