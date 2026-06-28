@@ -6,3 +6,6 @@ node_modules/
 
 # Claude Code local settings
 .claude/
+
+# 本地运行依赖：clawd-on-desk 是 AGPL，只当运行时依赖，绝不提交进本仓库
+clawd-on-desk/
