@@ -223,13 +223,15 @@ function renderStep() {
     $("twPhase").textContent = `第 ${st.setNo} / ${st.sets} 组`;
     area.innerHTML = `<div class="big-reps">×${st.reps}</div>
       <div class="reps-label">${chosen.zh}${st.side ? (" · " + st.side) : ""}</div>
+      <div class="how-to">${chosen.desc || ""}</div>
       <button class="btn-go big-done" id="setDone">✓ 这组做完</button>`;
     $("setDone").onclick = next;
   } else { // hold / timed
     const isTimed = st.kind === "timed";
     dots(st.setNo - 1, st.setNo, st.sets);
     $("twPhase").textContent = isTimed ? "持续训练" : `第 ${st.setNo} / ${st.sets} 组`;
-    area.innerHTML = ring("pink") + `<div class="wo-label">${isTimed ? "持续" : "保持"}${st.side ? (" · " + st.side) : ""}</div>`;
+    area.innerHTML = ring("pink") + `<div class="wo-label">${isTimed ? "持续" : "保持"}${st.side ? (" · " + st.side) : ""}</div>
+      <div class="how-to">${chosen.desc || ""}</div>`;
     runCountdown(st.sec, next);
   }
 }
@@ -248,8 +250,14 @@ function onWorkoutDone() {
   notifyHost("workout_done");   // 让桌面螃蟹比心（主进程不关窗，庆祝屏停留）
   show("s-done");
 }
+// 完成激励语跟着这次动作走：颈肩/眼睛→颈椎；减脂→心率；其余→比心（不给腿日发「颈椎感谢」）
+function pickCheer(m) {
+  if (m && (m.part === "颈肩" || m.part === "眼睛")) return '你的颈椎刚发来<br>一条<span class="hl">感谢</span>';
+  if (m && m.goal === "lose") return '5 分钟偷回来了<br>这把<span class="hl">心率</span>你赢了';
+  return '动完这一下<br>螃蟹给你<span class="hl">比个心</span>';
+}
 function celebrate() {
-  $("cheer").textContent = DONE_MSGS[Math.floor(Math.random() * DONE_MSGS.length)];
+  $("cheer").innerHTML = pickCheer(chosen);
   const st = stats();
   $("streakN").textContent = st.streak; $("weekN").textContent = st.weekDone;
   const wrap = $("doneWrap");
