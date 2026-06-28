@@ -1,10 +1,14 @@
 # Cooldown 🦀
 
+**Burn Your Body, Cooldown Your Brain.**
+
 > 等 coding agent 跑完的那几分钟，别干刷手机 —— 桌面上的小螃蟹递给你一张微健身卡，动一下。
 
 **Cooldown** 是一只住在你桌面的小螃蟹。当它发现你在等 Claude Code / Codex 跑一个长任务、人停下来干等的时候，会递上一张微健身卡：按你所在的场合（工位 / 咖啡厅 / 家里）抽一个做得了的动作，跟着做完几组，螃蟹给你比个心。把「等编译、等 agent」的碎片时间，变成久坐身体的一次小回血。
 
 别的桌宠在你等的时候卖萌，Cooldown 把等待变成 cooldown —— 给你的，也给 agent 的。
+
+**适合人群**：vibe coder —— 整天跟 AI 结对、久坐写码的你。
 
 ---
 

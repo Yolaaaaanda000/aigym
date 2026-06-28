@@ -9,3 +9,6 @@ node_modules/
 
 # 本地运行依赖：clawd-on-desk 是 AGPL，只当运行时依赖，绝不提交进本仓库
 clawd-on-desk/
+
+# demo / pitch / 草稿：本地私有，不公开
+demo/
