@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Break Card</title>
+<style>
+  /* ---- Design tokens (Spark Garden 纸感 / 手绘) ---- */
+  :root{
+    --paper:#f3ead7;        /* 牛皮纸底 */
+    --paper-deep:#e7d8b8;
+    --ink:#3a3128;          /* 墨色文字 */
+    --ink-soft:#7a6f5d;
+    --accent:#c8643c;       /* 朱砂橙 (动起来) */
+    --accent-cool:#5b7a6a;  /* 拉伸/呼吸 的青绿 */
+    --line:#cdbf9f;
+    --shadow:rgba(58,49,40,.22);
+    --card-w:300px;
+    --card-h:420px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:transparent;               /* Electron 里透明; 调试时给个底色 */
+    font-family:"PingFang SC","Songti SC",Georgia,serif;
+    display:flex;align-items:center;justify-content:center;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  /* 调试时的可见底色, 注入 Electron 时删掉这条 */
+  body.debug{background:#9aa89c}
+
+  .stage{ position:relative; width:var(--card-w); height:calc(var(--card-h) + 90px); }
+
+  /* ---- 抽卡牌 ---- */
+  .deck{ position:relative; width:var(--card-w); height:var(--card-h); cursor:pointer;
+    perspective:1400px; }
+  .card{ position:absolute; inset:0; transform-style:preserve-3d;
+    transition:transform .7s cubic-bezier(.2,.8,.2,1); }
+  .face{ position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:14px; box-shadow:0 14px 30px var(--shadow);
+    background:var(--paper);
+    /* 纸纹 */
+    background-image:
+      radial-gradient(circle at 30% 20%, rgba(255,255,255,.5), transparent 40%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.012) 0 2px, transparent 2px 4px);
+    border:1px solid var(--line);
+    overflow:hidden;
+  }
+  .back{ display:flex; align-items:center; justify-content:center; flex-direction:column;
+    background:var(--paper-deep); }
+  .back .mark{ width:120px;height:120px;border:2px dashed var(--accent);
+    border-radius:50%; display:flex;align-items:center;justify-content:center;
+    font-size:54px; color:var(--accent); }
+  .back .hint{ margin-top:22px; color:var(--ink-soft); letter-spacing:3px; font-size:14px;}
+  .front{ transform:rotateY(180deg); display:flex; flex-direction:column; padding:22px;}
+
+  /* 翻牌 */
+  .deck.flipped .card{ transform:rotateY(180deg); }
+  /* 抽卡时轻微抬起+晃动 */
+  .deck.dealing .card{ animation:deal .5s ease; }
+  @keyframes deal{
+    0%{transform:translateY(0) rotateZ(0)}
+    30%{transform:translateY(-14px) rotateZ(-3deg)}
+    60%{transform:translateY(-6px) rotateZ(2deg)}
+    100%{transform:translateY(0) rotateZ(0)}
+  }
+
+  /* ---- 动作卡正面 ---- */
+  .front .eyebrow{ font-size:12px;letter-spacing:4px;text-transform:uppercase;
+    color:var(--accent); margin-bottom:6px;}
+  .front .move{ font-size:30px; font-weight:700; color:var(--ink); line-height:1.15;}
+  .front .move-en{ font-size:13px; color:var(--ink-soft); margin-top:2px; letter-spacing:1px;}
+  .front .emoji{ font-size:84px; text-align:center; margin:18px 0 10px;
+    filter:drop-shadow(0 6px 8px var(--shadow)); }
+  .front .desc{ font-size:14px;color:var(--ink-soft); line-height:1.6; flex:1;}
+  .front .meta{ display:flex; gap:8px; margin-top:8px; }
+  .tag{ font-size:11px; padding:3px 9px; border-radius:20px;
+    border:1px solid var(--line); color:var(--ink-soft); background:rgba(255,255,255,.4);}
+  .tag.goal{ border-color:var(--accent); color:var(--accent); }
+
+  /* ---- 倒计时 ---- */
+  .timer{ position:absolute; inset:0; border-radius:14px; background:var(--paper);
+    border:1px solid var(--line); box-shadow:0 14px 30px var(--shadow);
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    padding:24px; }
+  .timer.show{ display:flex; }
+  .timer .now{ font-size:22px; color:var(--ink); font-weight:600; text-align:center;}
+  .ring{ position:relative; width:200px;height:200px; margin:18px 0;}
+  .ring svg{ transform:rotate(-90deg); }
+  .ring .track{ fill:none; stroke:var(--line); stroke-width:10; }
+  .ring .prog{ fill:none; stroke:var(--accent); stroke-width:10; stroke-linecap:round;
+    transition:stroke-dashoffset 1s linear; }
+  .ring .count{ position:absolute; inset:0; display:flex;align-items:center;justify-content:center;
+    font-size:46px; font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .timer .sub{ color:var(--ink-soft); font-size:13px; }
+
+  /* ---- 控制条 ---- */
+  .controls{ position:absolute; bottom:0; left:0; right:0; height:64px;
+    display:flex; align-items:center; justify-content:center; gap:12px; }
+  button{ font-family:inherit; cursor:pointer; border:none; border-radius:24px;
+    padding:11px 22px; font-size:14px; font-weight:600; transition:transform .12s, filter .12s;}
+  button:active{ transform:scale(.96); }
+  .btn-primary{ background:var(--accent); color:#fff; box-shadow:0 6px 14px var(--shadow);}
+  .btn-ghost{ background:transparent; color:var(--ink-soft); }
+  .btn-primary:hover{ filter:brightness(1.05);}
+  .hidden{ display:none !important; }
+
+  /* 完成态小庆祝 */
+  .done .front .emoji{ animation:pop .6s ease; }
+  @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1)}}
+
+  @media (prefers-reduced-motion:reduce){
+    .card,.deck.dealing .card,.front .emoji{transition:none;animation:none}
+  }
+</style>
+</head>
+<body class="debug">
+  <div class="stage">
+    <!-- 抽卡区 -->
+    <div class="deck" id="deck">
+      <div class="card" id="card">
+        <div class="face back">
+          <div class="mark">🦀</div>
+          <div class="hint">抽 一 张 · 动 5 分 钟</div>
+        </div>
+        <div class="face front" id="front">
+          <div class="eyebrow" id="goalLabel">力量</div>
+          <div class="move" id="moveZh">深蹲</div>
+          <div class="move-en" id="moveEn">Squat</div>
+          <div class="emoji" id="moveEmoji">🏋️</div>
+          <div class="desc" id="moveDesc"></div>
+          <div class="meta">
+            <span class="tag goal" id="tagGoal">力量</span>
+            <span class="tag" id="tagPart">下肢</span>
+            <span class="tag" id="tagDur">5 分钟</span>
+          </div>
+        </div>
+      </div>
+      <!-- 倒计时盖在卡上 -->
+      <div class="timer" id="timer">
+        <div class="now" id="timerMove">深蹲</div>
+        <div class="ring">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle class="track" cx="100" cy="100" r="90"></circle>
+            <circle class="prog" id="prog" cx="100" cy="100" r="90"
+              stroke-dasharray="565.48" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="count" id="count">5:00</div>
+        </div>
+        <div class="sub" id="timerSub">动起来，等它跑完不如等你练完</div>
+      </div>
+    </div>
+
+    <!-- 控制条 -->
+    <div class="controls" id="controls">
+      <button class="btn-primary" id="drawBtn">抽一张</button>
+      <button class="btn-ghost" id="skipBtn">这次不练</button>
+    </div>
+  </div>
+
+<script>
+/* =======================================================
+   动作库 / 文案 / 目标分类 —— 全部来自外部 design/moves.json
+   ⚠️ 这块由 Claire 设计填充，引擎不写死任何内容。
+   字段说明见 design/README.md
+   ======================================================= */
+let MOVES = [];                 // 启动时从 moves.json 加载
+let GOAL_LABEL = {};            // 目标 key → 显示名，也来自 moves.json
+let CONFIG = {};                // 文案/行为开关，来自 moves.json
+
+// 加载失败时的兜底，保证浮窗在没有 json 时也不白屏（仅占位）
+const FALLBACK = {
+  goals: { strength: "力量" },
+  moves: [{ zh:"站起来动一动", en:"Stand & Move", emoji:"🚶", goal:"strength", part:"全身", desc:"moves.json 未加载，这是占位动作。" }],
+  config: {}
+};
+
+async function loadMoves(){
+  try{
+    const res = await fetch("../design/moves.json", { cache:"no-store" });
+    if(!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    MOVES = data.moves || [];
+    GOAL_LABEL = data.goals || {};
+    CONFIG = data.config || {};
+  }catch(e){
+    console.warn("[breakcard] moves.json 加载失败，用占位数据:", e);
+    MOVES = FALLBACK.moves; GOAL_LABEL = FALLBACK.goals; CONFIG = FALLBACK.config;
+  }
+}
+
+/* 当前健身目标 —— 决定加权抽卡。之后从用户设置读取 */
+let CURRENT_GOAL = "strength";        // lose | strength | stretch | null(=不偏好)
+const DURATION = 5 * 60;              // 5 分钟，单位秒；调试可改小如 10
+
+/* ---- 加权抽卡 ---- */
+function drawMove(){
+  // 命中目标的动作权重×3，其它×1
+  const weighted = [];
+  for(const m of MOVES){
+    const w = (CURRENT_GOAL && m.goal===CURRENT_GOAL) ? 3 : 1;
+    for(let i=0;i<w;i++) weighted.push(m);
+  }
+  return weighted[Math.floor(Math.random()*weighted.length)];
+}
+
+const deck=document.getElementById("deck");
+const card=document.getElementById("card");
+const drawBtn=document.getElementById("drawBtn");
+const skipBtn=document.getElementById("skipBtn");
+const controls=document.getElementById("controls");
+const timer=document.getElementById("timer");
+let dealt=false, ticking=null;
+
+function fillCard(m){
+  document.getElementById("goalLabel").textContent = GOAL_LABEL[m.goal];
+  document.getElementById("moveZh").textContent = m.zh;
+  document.getElementById("moveEn").textContent = m.en;
+  document.getElementById("moveEmoji").textContent = m.emoji;
+  document.getElementById("moveDesc").textContent = m.desc;
+  document.getElementById("tagGoal").textContent = GOAL_LABEL[m.goal];
+  document.getElementById("tagPart").textContent = m.part;
+  document.getElementById("timerMove").textContent = m.zh;
+}
+
+function handleDraw(){
+  if(dealt) return;
+  dealt=true;
+  const m=drawMove();
+  fillCard(m);
+  deck.classList.add("dealing");
+  setTimeout(()=>{
+    deck.classList.remove("dealing");
+    deck.classList.add("flipped");          // 翻到正面
+    // 翻完后把按钮换成"开始 5 分钟 / 再抽一张"
+    drawBtn.textContent="开始 5 分钟";
+    drawBtn.onclick=startTimer;
+    skipBtn.textContent="换一张";
+    skipBtn.onclick=reDraw;
+  },480);
+}
+
+function reDraw(){
+  deck.classList.remove("flipped");
+  setTimeout(()=>{ dealt=false; handleDraw(); },400);
+}
+
+function startTimer(){
+  controls.classList.add("hidden");
+  timer.classList.add("show");
+  const prog=document.getElementById("prog");
+  const count=document.getElementById("count");
+  const C=565.48;
+  let left=DURATION;
+  const render=()=>{
+    const mm=Math.floor(left/60), ss=left%60;
+    count.textContent=`${mm}:${String(ss).padStart(2,"0")}`;
+    prog.style.strokeDashoffset = C*(1-left/DURATION);
+  };
+  render();
+  ticking=setInterval(()=>{
+    left--;
+    if(left<0){ finish(); return; }
+    render();
+  },1000);
+}
+
+function finish(){
+  clearInterval(ticking);
+  document.getElementById("timerSub").textContent="完成 ✓ 螃蟹给你比个心";
+  document.getElementById("count").textContent="✓";
+  document.querySelector(".prog").style.stroke="var(--accent-cool)";
+  card.parentElement.classList.add("done");
+  // 通知宿主(Electron): 该让螃蟹切到 happy/比心，并关掉浮窗
+  setTimeout(()=>{ notifyHost("workout_done"); }, 1800);
+}
+
+function handleSkip(){ notifyHost("workout_skipped"); }
+
+/* ---- 与宿主通信的桩。浏览器调试时只 console.log ---- */
+function notifyHost(event){
+  if(window.breakcardAPI && window.breakcardAPI.notify){
+    window.breakcardAPI.notify(event);
+  }else{
+    console.log("[breakcard] notifyHost:", event);
+    // 浏览器调试: 自己复位
+    if(event!=="workout_done") location.reload();
+  }
+}
+
+drawBtn.onclick=handleDraw;
+skipBtn.onclick=handleSkip;
+
+/* 宿主可调用: 设置目标 + 自动展示 */
+window.breakcardSetGoal = (g)=>{ CURRENT_GOAL = g; };
+
+/* ---- 启动：先加载数据，再放开抽卡 ---- */
+drawBtn.disabled = true;
+drawBtn.textContent = "准备中…";
+loadMoves().then(()=>{
+  drawBtn.disabled = false;
+  drawBtn.textContent = "抽一张";
+  // 若 config 里有默认目标，用它
+  if(CONFIG.defaultGoal) CURRENT_GOAL = CONFIG.defaultGoal;
+});
+
+</script>
+</body>
+</html>

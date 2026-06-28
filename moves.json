@@ -1,0 +1,26 @@
+{
+  "_说明": "这份文件由 Claire 设计填充。引擎只读这里，不写死任何内容。字段含义见 design/README.md。下面的数据是占位示例，可全部替换。",
+
+  "goals": {
+    "lose": "减脂",
+    "strength": "力量",
+    "stretch": "拉伸"
+  },
+
+  "config": {
+    "defaultGoal": "strength",
+    "durationSec": 300,
+    "deckHint": "抽 一 张 · 动 5 分 钟",
+    "timerSub": "动起来，等它跑完不如等你练完",
+    "doneText": "完成 ✓ 螃蟹给你比个心"
+  },
+
+  "moves": [
+    { "zh": "开合跳", "en": "Jumping Jacks", "emoji": "🤸", "goal": "lose", "part": "全身", "desc": "全身有氧，快速升心率。等代码编译的 5 分钟正好。" },
+    { "zh": "高抬腿", "en": "High Knees", "emoji": "🏃", "goal": "lose", "part": "全身", "desc": "原地高抬腿，核心收紧，节奏快一点。" },
+    { "zh": "深蹲", "en": "Squat", "emoji": "🏋️", "goal": "strength", "part": "下肢", "desc": "脚与肩同宽，臀部向后坐，膝盖不超脚尖。" },
+    { "zh": "平板支撑", "en": "Plank", "emoji": "💪", "goal": "strength", "part": "核心", "desc": "肘撑地，身体一条直线，别塌腰别撅臀。" },
+    { "zh": "颈部放松", "en": "Neck Release", "emoji": "🧘", "goal": "stretch", "part": "颈肩", "desc": "久坐救星。缓慢转头、侧倾，别甩脖子。" },
+    { "zh": "踝泵+起立", "en": "Stand & Move", "emoji": "🚶", "goal": "stretch", "part": "全身", "desc": "站起来走两步，活动脚踝，喝口水。最低门槛。" }
+  ]
+}
