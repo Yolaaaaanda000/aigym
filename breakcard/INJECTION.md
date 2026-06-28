@@ -198,6 +198,48 @@ function setState(newState, svgOverride, options = {}) {
 
 ---
 
+## B 待办：设置页接通引擎（让「免打扰 / 频率 / 静默」真正改弹卡时机）
+
+> v2「B」已在浮窗侧做满：分组训练 + 设置页 + snooze + 记录。设置目前**只持久化到 renderer 的 localStorage**（key `breakcard.settings.v1`）——主进程读不到它，所以设置此刻还改不了弹卡行为。下面是把它接通引擎的契约，照做即可，**无需重新设计**。架构：`triggers.json` = 默认；`user-settings.json` = 用户覆盖；引擎读「合并后」的值。
+
+### renderer 已经存好的 payload（`breakcard.settings.v1`）
+```jsonc
+{ "dnd": false, "freq": "mid", "quiet": true,
+  "_effective": {                 // ← 引擎直接读这块，已映射好
+    "dnd": false,
+    "cooldownMin": 30,            // freq 少/中/多 → 60/30/15
+    "dailyCap": 8,               // freq 少/中/多 → 4/8/12
+    "quietHours": ["22:00","08:00"]  // quiet=false 时为 null
+  } }
+```
+
+### 三处改动（都在 clawd-on-desk 本地，不入 aigym 仓库）
+1. **preload**（`breakcard/breakcard-preload.js`）——在现有 `notify` 旁加一条带返回的通道：
+   ```javascript
+   contextBridge.exposeInMainWorld("breakcardAPI", {
+     notify: (event) => ipcRenderer.send("breakcard-event", event),
+     saveSettings: (payload) => ipcRenderer.invoke("breakcard:save-settings", payload)   // 新增
+   });
+   ```
+   然后在 `breakcard.js` 的 `saveSettings()` 末尾打开那行已写好的注释调用 `window.breakcardAPI.saveSettings?.(payload)`。
+2. **main.js**——落盘到主进程拥有的文件：
+   ```javascript
+   ipcMain.handle("breakcard:save-settings", (_e, payload) => {
+     fs.writeFileSync(path.join(app.getPath("userData"), "breakcard-user-settings.json"),
+       JSON.stringify(payload, null, 2));
+   });
+   ```
+3. **弹卡判定**（现在读 `triggers.json` 的那段，`maybeShowBreakCard` 一带）——叠加用户覆盖：
+   - 读 `breakcard-user-settings.json`（读不到就当全默认）；
+   - `_effective.dnd === true` → 直接 return，不弹；
+   - 用 `_effective.cooldownMin` 覆盖 `triggers.json` 的 cooldown；新增 `dailyCap` 每日计数闸；
+   - 当前时间落在 `_effective.quietHours` 内 → 不弹（与 `activeHours` 取交集）。
+
+### `workout_snoozed` 事件（renderer 已会发）
+浮窗点「待会儿再说」会经 preload 发 `workout_snoozed`。现有 `ipcMain.on("breakcard-event", …)` 收到后会照常关窗（安全，无需改）。**可选增强**：收到后按 `moves.json` 的 `config.trigger.snoozeOptions`（如 30 分钟）起一个定时器到点重弹。
+
+---
+
 ## 比心素材：`clawd-love.svg` —— 完成时螃蟹专属比心
 
 完成运动时引擎调 `setState("love")`，播放专属的「举爱心比心」动画（不是通用 happy）。两步，都在 clawd-on-desk 本地（属 AGPL 运行层，不入 aigym 仓库）：

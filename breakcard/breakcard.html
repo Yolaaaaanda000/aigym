@@ -60,7 +60,10 @@
   .titlebar .name{ font-size:15px; font-weight:900; letter-spacing:.3px; color:#fff;
     text-shadow:2px 2px 0 var(--ink); }
   .titlebar .name small{ color:#fff; font-weight:700; margin-left:7px; font-size:11px; opacity:.95; text-shadow:none;}
-  .titlebar .x{ margin-left:auto; width:24px;height:24px; background:#fff; border:2.5px solid var(--ink);
+  .titlebar .gear{ margin-left:auto; width:24px;height:24px; background:#fff; border:2.5px solid var(--ink);
+    border-radius:6px; display:flex;align-items:center;justify-content:center;
+    font-size:13px; font-weight:900; cursor:pointer; box-shadow:2px 2px 0 var(--ink);}
+  .titlebar .x{ width:24px;height:24px; background:#fff; border:2.5px solid var(--ink);
     border-radius:6px; display:flex;align-items:center;justify-content:center;
     font-size:13px; font-weight:900; cursor:pointer; box-shadow:2px 2px 0 var(--ink);}
 
@@ -116,9 +119,10 @@
   .slot.dealing .mini{ animation:dealIn .45s backwards; }
   @keyframes dealIn{ from{opacity:0; transform:translateY(16px) scale(.9)} to{opacity:1} }
 
-  .deal-foot{ text-align:center; margin-top:18px; font-size:12px; font-weight:700; }
+  .deal-foot{ margin-top:18px; font-size:12px; font-weight:700; display:flex; gap:10px; justify-content:center; align-items:center; }
   .link{ background:var(--orange); border:2.5px solid var(--ink); border-radius:7px; padding:4px 10px;
     cursor:pointer; box-shadow:2px 2px 0 var(--ink); display:inline-block; font-weight:900;}
+  .link.alt{ background:#fff; }
   .link:hover{ transform:translate(-1px,-1px); }
 
   /* ================= ② 翻开动作详情 ================= */
@@ -134,7 +138,9 @@
   .big-card .move-en{ font-size:13px; font-weight:700; color:var(--ink); opacity:.6; margin-top:3px; letter-spacing:.5px;}
   .big-card .emoji{ font-size:80px; text-align:center; margin:12px 0 8px; animation:bob 2.4s ease-in-out infinite;}
   @keyframes bob{ 50%{transform:translateY(-6px) rotate(-3deg)} }
-  .big-card .desc{ font-size:13.5px; font-weight:600; line-height:1.6; min-height:60px;}
+  .big-card .desc{ font-size:13.5px; font-weight:600; line-height:1.6; min-height:54px;}
+  .struct{ display:inline-block; font-size:12px; font-weight:900; background:var(--lime); border:2.5px solid var(--ink);
+    border-radius:7px; padding:4px 10px; box-shadow:2px 2px 0 var(--ink); margin-top:10px; }
   .fit-row{ display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
   .fit{ font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:7px;
     background:var(--lime); border:2px solid var(--ink); }
@@ -143,20 +149,30 @@
   .tag.goal{ background:var(--orange); }
   .tag.dur{ background:var(--cyan); }
 
-  /* ================= ③ 倒计时 ================= */
-  .timer-wrap{ display:flex; flex-direction:column; align-items:center; padding-top:10px;}
-  .timer-wrap .now{ font-size:26px; font-weight:900; letter-spacing:-.5px; text-align:center;}
-  .timer-wrap .now small{ display:block; font-size:12px; font-weight:700; opacity:.55; margin-top:4px;}
-  .ring-big{ position:relative; width:212px; height:212px; margin:22px 0 12px;
-    border:4px solid var(--ink); border-radius:50%; background:#fff; box-shadow:var(--sh-lg);}
-  .ring-big svg{ transform:rotate(-90deg); position:absolute; inset:0; }
-  .ring-big .track{ fill:none; stroke:#eee; stroke-width:13; }
-  .ring-big .prog{ fill:none; stroke:var(--pink); stroke-width:13; stroke-linecap:butt;
-    transition:stroke-dashoffset 1s linear; }
-  .ring-big .count{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-size:52px; font-weight:900; font-variant-numeric:tabular-nums; letter-spacing:-2px;}
-  .timer-wrap .tip{ font-size:12.5px; font-weight:700; margin-bottom:8px; text-align:center;
-    background:var(--purple); border:2.5px solid var(--ink); border-radius:8px; padding:5px 12px; box-shadow:2px 2px 0 var(--ink);}
+  /* ================= ③ 分组训练页（按组完成才弹 Done） ================= */
+  .train-wrap{ display:flex; flex-direction:column; align-items:center; padding-top:4px; }
+  .train-top{ text-align:center; }
+  .t-name{ font-size:24px; font-weight:900; letter-spacing:-.5px; }
+  .set-dots{ display:flex; gap:8px; justify-content:center; margin:12px 0 6px; }
+  .set-dots .d{ width:14px;height:14px; border:2.5px solid var(--ink); border-radius:50%; background:#fff; }
+  .set-dots .d.done{ background:var(--lime); }
+  .set-dots .d.cur{ background:var(--pink); transform:scale(1.25); }
+  .t-phase{ font-size:13px; font-weight:800; background:var(--cyan); border:2.5px solid var(--ink); border-radius:7px;
+    padding:3px 11px; box-shadow:2px 2px 0 var(--ink); display:inline-block; }
+  .work-area{ width:100%; min-height:286px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+  .big-reps{ font-size:74px; font-weight:900; letter-spacing:-3px; line-height:1; }
+  .reps-label{ font-size:16px; font-weight:800; }
+  .big-done{ font-size:18px; padding:16px 32px; margin-top:6px; }
+  .wo-ring{ position:relative; width:200px; height:200px; border:4px solid var(--ink); border-radius:50%;
+    background:#fff; box-shadow:var(--sh-lg); }
+  .wo-ring svg{ position:absolute; inset:0; transform:rotate(-90deg); }
+  .wo-ring .trk{ fill:none; stroke:#eee; stroke-width:12; }
+  .wo-ring .prg{ fill:none; stroke-width:12; stroke-linecap:butt; transition:stroke-dashoffset 1s linear; }
+  .wo-ring .prg.pink{ stroke:var(--pink); } .wo-ring .prg.cyan{ stroke:var(--cyan); }
+  .wo-ring .cnt{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:48px; font-weight:900; letter-spacing:-2px; font-variant-numeric:tabular-nums; }
+  .wo-label{ font-size:16px; font-weight:800; }
+  .rest-next{ font-size:13px; font-weight:700; opacity:.7; }
 
   /* ================= ④ 完成庆祝 ================= */
   .done-wrap{ display:flex; flex-direction:column; align-items:center; text-align:center; padding-top:8px; position:relative;}
@@ -229,9 +245,29 @@
   .pill{ font-size:10px; font-weight:900; padding:2px 8px; border-radius:6px; border:2px solid var(--ink); flex:none;}
   .pill.done{ background:var(--lime); }
   .pill.skip{ background:var(--orange); }
+  .pill.snooze{ background:var(--purple); }
+
+  /* ================= ⑦ 设置页（触发与免打扰） ================= */
+  .set-head{ font-size:20px; font-weight:900; letter-spacing:-.5px; margin-bottom:4px; }
+  .set-sub{ font-size:11.5px; font-weight:700; opacity:.6; margin-bottom:18px; }
+  .set-group{ border:var(--bd); border-radius:12px; padding:13px 14px; margin-bottom:13px; box-shadow:var(--sh-sm); background:#fff; }
+  .set-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .set-row .lbl{ font-size:14.5px; font-weight:900; }
+  .set-note{ font-size:11.5px; font-weight:600; opacity:.7; margin-top:8px; line-height:1.5; }
+  .toggle{ width:54px;height:30px; border:3px solid var(--ink); border-radius:18px; background:#fff; position:relative;
+    cursor:pointer; box-shadow:2px 2px 0 var(--ink); flex:none; }
+  .toggle .knob{ position:absolute; top:2px; left:2px; width:20px;height:20px; border:2.5px solid var(--ink); border-radius:50%;
+    background:#fff; transition:.15s; }
+  .toggle.on{ background:var(--lime); } .toggle.on .knob{ left:26px; }
+  .seg{ display:flex; border:3px solid var(--ink); border-radius:9px; overflow:hidden; box-shadow:2px 2px 0 var(--ink); }
+  .seg span{ padding:7px 13px; font-size:12px; font-weight:800; cursor:pointer; border-right:2.5px solid var(--ink); background:#fff; }
+  .seg span:last-child{ border-right:none; } .seg span.on{ background:var(--cyan); }
+  .quiet{ font-size:13px; font-weight:900; background:var(--purple); border:2.5px solid var(--ink); border-radius:7px;
+    padding:4px 10px; box-shadow:2px 2px 0 var(--ink); }
+  .set-static{ font-size:13px; font-weight:800; }
 
   /* ---------- 通用按钮 ---------- */
-  .controls{ display:flex; align-items:center; justify-content:center; gap:11px; margin-top:22px; }
+  .controls{ display:flex; align-items:center; justify-content:center; gap:11px; margin-top:22px; flex-wrap:wrap; }
   button{ font-family:inherit; cursor:pointer; border:var(--bd); border-radius:10px;
     padding:12px 20px; font-size:14px; font-weight:900; background:#fff; box-shadow:var(--sh); transition:.1s; }
   button:hover{ transform:translate(-1px,-1px); box-shadow:6px 6px 0 var(--ink); }
@@ -239,6 +275,8 @@
   .btn-primary{ background:var(--pink); color:#fff; }
   .btn-go{ background:var(--lime); }
   .btn-ghost{ background:#fff; }
+  .btn-sm{ padding:9px 15px; font-size:12.5px; box-shadow:var(--sh-sm); }
+  .btn-sm:hover{ box-shadow:4px 4px 0 var(--ink); } .btn-sm:active{ box-shadow:0 0 0 var(--ink); }
 
   /* ---------- demo 导航 ---------- */
   .demo-nav{ position:fixed; bottom:0; left:0; right:0; z-index:50;
@@ -257,7 +295,8 @@
   <div class="panel">
     <div class="titlebar">
       <span class="crab">🦀</span>
-      <span class="name">BREAKCARD <small>抽一张 · 动 5 分钟</small></span>
+      <span class="name">BREAKCARD <small>抽一张 · 动一下</small></span>
+      <span class="gear" id="gearBtn" title="设置">⚙</span>
       <span class="x">✕</span>
     </div>
 
@@ -271,7 +310,10 @@
         <span class="sub" id="poolInfo">6 张都适合这里</span>
       </div>
       <div class="grid" id="grid"></div>
-      <div class="deal-foot">不想要这批？<span class="link" id="reshuffle">🔀 重新洗牌</span></div>
+      <div class="deal-foot">
+        <span class="link" id="reshuffle">🔀 重新洗牌</span>
+        <span class="link alt" id="snooze">⏰ 待会儿再说</span>
+      </div>
     </section>
 
     <!-- ② 翻开动作详情 -->
@@ -283,39 +325,37 @@
           <div class="move-en" id="rEn">Wall Sit</div>
           <div class="emoji" id="rEmoji">🧱</div>
           <div class="desc" id="rDesc"></div>
+          <div class="struct" id="rStruct">3 组 × 45 秒</div>
           <div class="fit-row" id="rFit"></div>
           <div class="meta-row">
             <span class="tag goal" id="rTagGoal">力量</span>
             <span class="tag" id="rTagPart">下肢</span>
-            <span class="tag dur">5 分钟</span>
+            <span class="tag dur" id="rTagEst">约 3 分钟</span>
           </div>
         </div>
         <div class="controls">
           <button class="btn-ghost" id="rRedraw">↻ 换一张</button>
-          <button class="btn-go" id="rStart">开始 5 分钟</button>
+          <button class="btn-go" id="rStart">开始 · 约 3 分钟</button>
         </div>
         <div class="controls" style="margin-top:8px">
-          <button class="btn-ghost" id="rSkip" style="font-size:12.5px; padding:9px 16px">这次不练</button>
+          <button class="btn-ghost btn-sm" id="rSkip">这次不练</button>
         </div>
       </div>
     </section>
 
-    <!-- ③ 倒计时 -->
+    <!-- ③ 分组训练页（按组完成才弹 Done） -->
     <section class="screen" id="s-timer">
-      <div class="timer-wrap">
-        <div class="now" id="tName">靠墙静蹲<small id="tEn">Wall Sit</small></div>
-        <div class="ring-big">
-          <svg width="212" height="212" viewBox="0 0 212 212">
-            <circle class="track" cx="106" cy="106" r="92"></circle>
-            <circle class="prog" id="tProg" cx="106" cy="106" r="92"
-              stroke-dasharray="578" stroke-dashoffset="0"></circle>
-          </svg>
-          <div class="count" id="tCount">0:30</div>
+      <div class="train-wrap">
+        <div class="train-top">
+          <div class="t-name" id="twName">靠墙静蹲</div>
+          <div class="set-dots" id="setDots"></div>
+          <div class="t-phase" id="twPhase">第 1 / 3 组</div>
         </div>
-        <div class="tip" id="tTip">动起来，等它跑完不如等你练完</div>
+        <div class="work-area" id="workArea"></div>
         <div class="controls">
-          <button class="btn-ghost" id="tGiveup">放弃</button>
-          <button class="btn-primary" id="tDone">Done ✓</button>
+          <button class="btn-ghost btn-sm" id="twPause">⏸ 暂停</button>
+          <button class="btn-ghost btn-sm" id="twSkipSet">跳过这组</button>
+          <button class="btn-ghost btn-sm" id="twGiveup">放弃</button>
         </div>
       </div>
     </section>
@@ -370,6 +410,53 @@
         <span class="tab" data-f="skip">拒绝</span>
       </div>
       <div class="rec-list" id="recList"></div>
+    </section>
+
+    <!-- ⑦ 设置页（触发与免打扰） -->
+    <section class="screen" id="s-settings">
+      <div class="set-head">设置 · 触发与免打扰</div>
+      <div class="set-sub">控制螃蟹什么时候、多频繁递卡给你</div>
+
+      <div class="set-group">
+        <div class="set-row">
+          <span class="lbl">免打扰</span>
+          <span class="toggle" id="dndToggle"><span class="knob"></span></span>
+        </div>
+        <div class="set-note" id="dndNote">关：正常弹卡。开：专注/会议时，螃蟹不递卡。</div>
+      </div>
+
+      <div class="set-group">
+        <div class="set-row">
+          <span class="lbl">弹卡频率</span>
+          <span class="seg" id="freqSeg">
+            <span data-f="low">少点</span><span data-f="mid" class="on">适中</span><span data-f="high">多点</span>
+          </span>
+        </div>
+        <div class="set-note" id="freqNote">适中：约每 30 分钟最多一次，每天 ≤ 8 次。</div>
+      </div>
+
+      <div class="set-group">
+        <div class="set-row">
+          <span class="lbl">静默时段</span>
+          <span class="quiet" id="quietVal">22:00 – 08:00</span>
+        </div>
+        <div class="set-row" style="margin-top:10px">
+          <span class="set-note" style="margin-top:0">这段时间一律不弹卡</span>
+          <span class="toggle on" id="quietToggle"><span class="knob"></span></span>
+        </div>
+      </div>
+
+      <div class="set-group">
+        <div class="set-row">
+          <span class="lbl">弹卡方式</span>
+          <span class="set-static">直接弹整张卡</span>
+        </div>
+        <div class="set-note">working → idle（agent 跑完）那一刻直接递上抽卡浮窗。</div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-primary" id="setBack">完成</button>
+      </div>
     </section>
   </div>
 
